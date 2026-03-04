@@ -1,0 +1,95 @@
+# cg-emurouter
+
+Эмулятор объектов и оборудования с Web UI и публикацией телеметрии в MQTT.
+
+## Установка
+
+Требования:
+- `.NET SDK 8.0+`
+- MQTT брокер (например, Mosquitto)
+
+Шаги:
+1. Клонировать репозиторий.
+2. Перейти в папку проекта.
+3. Восстановить зависимости:
+
+```bash
+dotnet restore
+```
+
+## Запуск
+
+1. Скопировать `emulator.example.yaml` в `emulator.yaml` и отредактировать.
+2. Запустить:
+
+```bash
+dotnet run --project src/CgEmulator -- --config emulator.yaml
+```
+
+Web UI: `http://<host>:6666/`
+
+## Smoke test MQTT
+
+```bash
+mosquitto_sub -h 10.10.10.1 -t 'cg/v1/telemetry/SN/#' -v
+```
+
+Проверить наличие:
+- GPS сообщений раз в 60 сек
+- `PCC_3_3` пакетов раз в `equipment_period_sec`
+
+## Установка на сервер из Git
+
+1. Установить `.NET SDK 8.0+` на сервер.
+2. Клонировать репозиторий:
+
+```bash
+git clone https://github.com/zergont/cg-emurouter.git
+cd cg-emurouter
+```
+
+3. Подготовить конфиг:
+
+```bash
+cp emulator.example.yaml emulator.yaml
+```
+
+4. Отредактировать `emulator.yaml` (MQTT host/port, bind IP и т.д.).
+5. Запустить:
+
+```bash
+dotnet run --project src/CgEmulator -- --config emulator.yaml
+```
+
+## Работа сервиса
+
+- Web UI: `http://<server-ip>:6666/`
+- В UI:
+  - создать объекты,
+  - нажать `Start` для начала публикации,
+  - нажать `Stop` для остановки и заморозки симуляции.
+
+## Проверка работы
+
+Проверка через MQTT:
+
+```bash
+mosquitto_sub -h <mqtt-host> -t 'cg/v1/telemetry/SN/#' -v
+```
+
+Ожидается:
+- GPS сообщения раз в 60 сек,
+- `PCC_3_3` сообщения раз в `equipment_period_sec`,
+- формат `70` и `290` как `"[hi,lo]"`.
+
+## Деинсталляция с сервера
+
+1. Остановить процесс сервиса (`Ctrl+C`, если запущен в консоли).
+2. Удалить директорию проекта:
+
+```bash
+cd ..
+rm -rf cg-emurouter
+```
+
+3. (Опционально) удалить установленный `.NET SDK`, если он больше не нужен.

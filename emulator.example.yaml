@@ -1,0 +1,20 @@
+web:
+  bind_ip: "0.0.0.0"
+  port: 6666
+
+mqtt:
+  host: "10.10.10.1"
+  port: 1883
+  topic_prefix: "cg/v1/telemetry/SN"
+  client_id_prefix: "cg-emulator"
+  protocol: "v5"
+  qos: 0
+
+defaults:
+  gps_period_sec: 60
+  equipment_period_sec: 5
+  gps_drift_m: 300
+  rf_anchor_offset_km: 50
+
+logging:
+  level: "Information"

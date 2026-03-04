@@ -1,0 +1,28 @@
+# Build artifacts
+bin/
+obj/
+out/
+publish/
+
+# Visual Studio / Rider
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+_ReSharper*/
+*.DotSettings.user
+
+# Logs and temp files
+*.log
+logs/
+*.tmp
+*.cache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local runtime/config overrides (keep example only)
+emulator.yaml
+appsettings.Development.json
