@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>cg-emulator</title>
+  <title>Эмулятор CG</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
@@ -16,19 +16,20 @@
   </style>
 </head>
 <body>
-  <h2>cg-emulator</h2>
+  <h2>Эмулятор CG</h2>
+  <div class="row"><small id="version"></small></div>
 
   <div class="row">
-    <label>N: <input id="objectCount" type="number" value="3" min="1"></label>
-    <label>min_equip: <input id="minEquip" type="number" value="1" min="1"></label>
-    <label>max_equip: <input id="maxEquip" type="number" value="3" min="1"></label>
-    <label>equipment_period_sec: <input id="periodSec" type="number" value="5" min="1"></label>
+    <label>Количество объектов: <input id="objectCount" type="number" value="3" min="1"></label>
+    <label>Мин. оборудования: <input id="minEquip" type="number" value="1" min="1"></label>
+    <label>Макс. оборудования: <input id="maxEquip" type="number" value="3" min="1"></label>
+    <label>Период оборудования (сек): <input id="periodSec" type="number" value="5" min="1"></label>
   </div>
 
   <div class="row">
     <button id="createBtn">Создать/Пересоздать объекты</button>
-    <button id="startBtn">Start</button>
-    <button id="stopBtn">Stop</button>
+    <button id="startBtn">Пуск</button>
+    <button id="stopBtn">Стоп</button>
     <strong id="status"></strong>
   </div>
 

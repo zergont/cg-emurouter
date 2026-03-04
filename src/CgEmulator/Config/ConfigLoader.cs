@@ -5,11 +5,19 @@ namespace CgEmulator.Config;
 
 public static class ConfigLoader
 {
+    private const string DefaultConfigName = "emulator.yaml";
+
     public static EmulatorConfig Load(string[] args)
     {
-        var configPath = GetConfigPath(args) ?? "emulator.yaml";
-        if (!File.Exists(configPath))
+        var requestedPath = GetConfigPath(args);
+        var configPath = ResolveConfigPath(requestedPath);
+        if (configPath is null)
         {
+            if (!string.IsNullOrWhiteSpace(requestedPath))
+            {
+                throw new FileNotFoundException($"Config file was not found: '{requestedPath}'");
+            }
+
             return new EmulatorConfig();
         }
 
@@ -20,6 +28,42 @@ public static class ConfigLoader
 
         var yaml = File.ReadAllText(configPath);
         return deserializer.Deserialize<EmulatorConfig>(yaml) ?? new EmulatorConfig();
+    }
+
+    private static string? ResolveConfigPath(string? requestedPath)
+    {
+        if (!string.IsNullOrWhiteSpace(requestedPath))
+        {
+            if (Path.IsPathRooted(requestedPath))
+            {
+                var absoluteRequested = Path.GetFullPath(requestedPath);
+                return File.Exists(absoluteRequested) ? absoluteRequested : null;
+            }
+
+            return FindByAscendingDirectories(requestedPath, Directory.GetCurrentDirectory())
+                ?? FindByAscendingDirectories(requestedPath, AppContext.BaseDirectory);
+        }
+
+        return FindByAscendingDirectories(DefaultConfigName, Directory.GetCurrentDirectory())
+            ?? FindByAscendingDirectories(DefaultConfigName, AppContext.BaseDirectory);
+    }
+
+    private static string? FindByAscendingDirectories(string fileName, string startDirectory)
+    {
+        var current = new DirectoryInfo(Path.GetFullPath(startDirectory));
+
+        while (current is not null)
+        {
+            var candidate = Path.Combine(current.FullName, fileName);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+
+            current = current.Parent;
+        }
+
+        return null;
     }
 
     private static string? GetConfigPath(string[] args)

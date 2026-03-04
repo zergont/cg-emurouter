@@ -1,6 +1,8 @@
 # cg-emurouter
 
-Эмулятор объектов и оборудования с Web UI и публикацией телеметрии в MQTT.
+Эмулятор объектов и оборудования с веб-интерфейсом и публикацией телеметрии в MQTT.
+
+Текущая версия: `0.0.1`
 
 ## Установка
 
@@ -26,9 +28,9 @@ dotnet restore
 dotnet run --project src/CgEmulator -- --config emulator.yaml
 ```
 
-Web UI: `http://<host>:6666/`
+Веб-интерфейс: `http://<host>:6666/`
 
-## Smoke test MQTT
+## Быстрая проверка MQTT
 
 ```bash
 mosquitto_sub -h 10.10.10.1 -t 'cg/v1/telemetry/SN/#' -v
@@ -63,8 +65,8 @@ dotnet run --project src/CgEmulator -- --config emulator.yaml
 
 ## Работа сервиса
 
-- Web UI: `http://<server-ip>:6666/`
-- В UI:
+- Веб-интерфейс: `http://<server-ip>:6666/`
+- В интерфейсе:
   - создать объекты,
   - нажать `Start` для начала публикации,
   - нажать `Stop` для остановки и заморозки симуляции.

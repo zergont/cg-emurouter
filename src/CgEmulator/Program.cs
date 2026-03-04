@@ -19,6 +19,8 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+app.MapGet("/api/version", () => Results.Ok(new { version = "0.0.1" }));
+
 app.MapGet("/api/state", (SimulationManager simulation) => Results.Ok(simulation.GetState()));
 
 app.MapPost("/api/objects", (SimulationManager simulation, CreateObjectsRequest request) =>
@@ -29,13 +31,13 @@ app.MapPost("/api/objects", (SimulationManager simulation, CreateObjectsRequest 
 app.MapPost("/api/start", (SimulationManager simulation) =>
 {
     simulation.Start();
-    return Results.Ok(new { status = "RUN" });
+    return Results.Ok(new { status = "\u0420\u0410\u0411\u041E\u0422\u0410\u0415\u0422" });
 });
 
 app.MapPost("/api/stop", (SimulationManager simulation) =>
 {
     simulation.Stop();
-    return Results.Ok(new { status = "STOP" });
+    return Results.Ok(new { status = "\u041E\u0421\u0422\u0410\u041D\u041E\u0412\u041B\u0415\u041D\u041E" });
 });
 
 app.Urls.Clear();

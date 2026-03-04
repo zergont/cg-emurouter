@@ -142,7 +142,7 @@ public sealed class ObjectSimulator
             CurrentLatitude = Math.Round(CurrentLatitude, 6),
             CurrentLongitude = Math.Round(CurrentLongitude, 6),
             EquipmentCount = _equipment.Count,
-            Status = running ? "RUN" : "STOP",
+            Status = running ? "РАБОТАЕТ" : "ОСТАНОВЛЕНО",
             Equipment = _equipment.Select(eq => new EquipmentStateDto
             {
                 ServerId = eq.ServerId,
@@ -184,7 +184,7 @@ public sealed class ObjectStateDto
     public int EquipmentCount { get; set; }
 
     [JsonPropertyName("status")]
-    public string Status { get; set; } = "STOP";
+    public string Status { get; set; } = "ОСТАНОВЛЕНО";
 
     [JsonPropertyName("equipment")]
     public List<EquipmentStateDto> Equipment { get; set; } = [];

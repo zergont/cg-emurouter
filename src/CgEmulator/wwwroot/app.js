@@ -10,7 +10,7 @@ function fmtCoord(lat, lon) {
 
 function render(state) {
   const status = document.getElementById('status');
-  status.textContent = state.is_running ? 'RUN' : 'STOP';
+  status.textContent = state.is_running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО';
 
   const content = document.getElementById('content');
   let html = '<table><thead><tr><th>SN</th><th>GPS фикс</th><th>Текущий GPS</th><th>Кол-во оборудования</th><th>Статус</th></tr></thead><tbody>';
@@ -22,6 +22,12 @@ function render(state) {
     for (const eq of obj.equipment) {
       html += `<tr><td>${eq.server_id}</td><td>${eq['3019']}</td><td>${eq['6109']}</td><td>${eq.sec_to_transition}</td><td>${eq['34']}</td><td>${eq['70']}</td><td>${eq['290']}</td></tr>`;
     }
+
+async function loadVersion() {
+  const info = await api('/api/version');
+  const version = document.getElementById('version');
+  version.textContent = `Версия: ${info.version}`;
+}
     html += '</tbody></table>';
     html += '</td></tr>';
   }
@@ -61,4 +67,5 @@ document.getElementById('stopBtn').addEventListener('click', async () => {
 });
 
 setInterval(loadState, 1000);
+loadVersion();
 loadState();
