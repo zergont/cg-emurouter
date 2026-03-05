@@ -28,7 +28,7 @@ dotnet restore
 dotnet run --project src/CgEmulator -- --config emulator.yaml
 ```
 
-Веб-интерфейс: `http://<host>:6666/`
+Веб-интерфейс: `http://<host>:6699/`
 
 ## Быстрая проверка MQTT
 
@@ -65,7 +65,7 @@ dotnet run --project src/CgEmulator -- --config emulator.yaml
 
 ## Работа сервиса
 
-- Веб-интерфейс: `http://<server-ip>:6666/`
+- Веб-интерфейс: `http://<server-ip>:6699/`
 - В интерфейсе:
   - создать объекты,
   - нажать `Start` для начала публикации,

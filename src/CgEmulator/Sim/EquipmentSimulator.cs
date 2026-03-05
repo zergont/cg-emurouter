@@ -15,8 +15,8 @@ public sealed class EquipmentSimulator
     {
         ServerId = serverId;
         _random = random;
-        NominalPower3019 = random.Next(5, 21) * 100;
-        EngineRunningTime70 = (uint)random.Next(0, 10001);
+        NominalPower3019 = random.Next(5, 21) * 1000;
+        EngineRunningTime70 = (uint)random.NextInt64(0, 10_000_001);
         ControllerOnTime290 = (uint)random.Next(0, 10001);
         _state = 0;
         _secondsInStateRemaining = NextStateDuration(_state);
@@ -46,7 +46,7 @@ public sealed class EquipmentSimulator
             ControllerOnTime290 = unchecked(ControllerOnTime290 + (uint)wholeSeconds);
             if (_state == 4)
             {
-                EngineRunningTime70 = unchecked(EngineRunningTime70 + (uint)wholeSeconds);
+                EngineRunningTime70 = unchecked(EngineRunningTime70 + (uint)(wholeSeconds * 10));
             }
 
             AdvanceStateMachine(wholeSeconds);
@@ -138,8 +138,8 @@ public sealed class EquipmentSimulator
 
     private void PickNextTarget()
     {
-        var min = (int)Math.Round(NominalPower3019 * 0.3);
-        var max = (int)Math.Round(NominalPower3019 * 0.9);
+        var min = (int)Math.Round(NominalPower3019 * 0.03);
+        var max = (int)Math.Round(NominalPower3019 * 0.09);
         _targetKw = _random.Next(min, max + 1);
     }
 
