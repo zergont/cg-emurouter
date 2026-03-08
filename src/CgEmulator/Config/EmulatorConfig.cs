@@ -4,6 +4,7 @@ public sealed class EmulatorConfig
 {
     public WebConfig Web { get; set; } = new();
     public MqttConfig Mqtt { get; set; } = new();
+    public ReplayConfig Replay { get; set; } = new();
     public DefaultsConfig Defaults { get; set; } = new();
     public LoggingConfig Logging { get; set; } = new();
 }
@@ -30,6 +31,12 @@ public sealed class DefaultsConfig
     public int EquipmentPeriodSec { get; set; } = 5;
     public int GpsDriftM { get; set; } = 300;
     public int RfAnchorOffsetKm { get; set; } = 50;
+}
+
+public sealed class ReplayConfig
+{
+    public int RatePerSec { get; set; } = 10;
+    public int BufferMaxSize { get; set; } = 1000;
 }
 
 public sealed class LoggingConfig

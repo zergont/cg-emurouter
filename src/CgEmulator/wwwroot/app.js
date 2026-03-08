@@ -8,7 +8,7 @@ function fmtCoord(lat, lon) {
   return `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
 }
 
-function render(state) {
+function renderState(state) {
   const status = document.getElementById('status');
   status.textContent = state.is_running ? 'РАБОТАЕТ' : 'ОСТАНОВЛЕНО';
 
@@ -19,15 +19,11 @@ function render(state) {
     html += `<tr><td>${obj.sn}</td><td>${fmtCoord(obj.fixed_lat, obj.fixed_lon)}</td><td>${fmtCoord(obj.current_lat, obj.current_lon)}</td><td>${obj.equipment_count}</td><td>${obj.status}</td></tr>`;
     html += '<tr><td colspan="5">';
     html += '<table class="equip-table"><thead><tr><th>server_id</th><th>3019</th><th>6109</th><th>сек до перехода</th><th>34</th><th>70</th><th>290</th></tr></thead><tbody>';
+
     for (const eq of obj.equipment) {
       html += `<tr><td>${eq.server_id}</td><td>${eq['3019']}</td><td>${eq['6109']}</td><td>${eq.sec_to_transition}</td><td>${eq['34']}</td><td>${eq['70']}</td><td>${eq['290']}</td></tr>`;
     }
 
-async function loadVersion() {
-  const info = await api('/api/version');
-  const version = document.getElementById('version');
-  version.textContent = `Версия: ${info.version}`;
-}
     html += '</tbody></table>';
     html += '</td></tr>';
   }
@@ -36,9 +32,32 @@ async function loadVersion() {
   content.innerHTML = html;
 }
 
+function renderReplayStatus(status) {
+  document.getElementById('replayBuffer').textContent = `${status.buffered} / ${status.max} сообщений`;
+  document.getElementById('replayMode').textContent = status.replaying
+    ? `Replaying (осталось ${status.buffered})`
+    : 'Live';
+  document.getElementById('replayRate').textContent = `${status.rate} msg/sec`;
+  document.getElementById('replayDropped').textContent = `${status.droppedTotal}`;
+}
+
+async function loadVersion() {
+  const info = await api('/api/version');
+  document.getElementById('version').textContent = `Версия: ${info.version}`;
+}
+
 async function loadState() {
   const state = await api('/api/state');
-  render(state);
+  renderState(state);
+}
+
+async function loadReplayStatus() {
+  const status = await api('/api/replay/status');
+  renderReplayStatus(status);
+}
+
+async function refresh() {
+  await Promise.all([loadState(), loadReplayStatus()]);
 }
 
 document.getElementById('createBtn').addEventListener('click', async () => {
@@ -48,24 +67,27 @@ document.getElementById('createBtn').addEventListener('click', async () => {
     max_equip: Number(document.getElementById('maxEquip').value),
     equipment_period_sec: Number(document.getElementById('periodSec').value)
   };
+
   const state = await api('/api/objects', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  render(state);
+
+  renderState(state);
+  await loadReplayStatus();
 });
 
 document.getElementById('startBtn').addEventListener('click', async () => {
   await api('/api/start', { method: 'POST' });
-  await loadState();
+  await refresh();
 });
 
 document.getElementById('stopBtn').addEventListener('click', async () => {
   await api('/api/stop', { method: 'POST' });
-  await loadState();
+  await refresh();
 });
 
-setInterval(loadState, 1000);
+setInterval(refresh, 1000);
 loadVersion();
-loadState();
+refresh();

@@ -18,6 +18,12 @@
 <body>
   <h2>Эмулятор CG</h2>
   <div class="row"><small id="version"></small></div>
+  <div class="row">
+    <div><strong>Буфер воспроизведения:</strong> <span id="replayBuffer">0 / 0 сообщений</span></div>
+    <div><strong>Режим:</strong> <span id="replayMode">Live</span></div>
+    <div><strong>Скорость воспроизведения:</strong> <span id="replayRate">0 msg/sec</span></div>
+    <div><strong>Отброшено:</strong> <span id="replayDropped">0</span></div>
+  </div>
 
   <div class="row">
     <label>Количество объектов: <input id="objectCount" type="number" value="3" min="1"></label>

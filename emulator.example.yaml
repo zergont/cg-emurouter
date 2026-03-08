@@ -10,6 +10,10 @@ mqtt:
   protocol: "v5"
   qos: 0
 
+replay:
+  rate_per_sec: 10
+  buffer_max_size: 1000
+
 defaults:
   gps_period_sec: 60
   equipment_period_sec: 5

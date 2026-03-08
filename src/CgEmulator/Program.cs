@@ -11,6 +11,8 @@ builder.Logging.AddConsole();
 
 builder.Services.AddSingleton(emulatorConfig);
 builder.Services.AddSingleton<SimulationManager>();
+builder.Services.AddSingleton<ReplayBuffer>(sp =>
+    new ReplayBuffer(emulatorConfig.Replay, sp.GetRequiredService<ILogger<ReplayBuffer>>()));
 builder.Services.AddSingleton<MqttPublisher>();
 builder.Services.AddHostedService<SimulationWorker>();
 
@@ -22,6 +24,8 @@ app.UseStaticFiles();
 app.MapGet("/api/version", () => Results.Ok(new { version = "0.0.1" }));
 
 app.MapGet("/api/state", (SimulationManager simulation) => Results.Ok(simulation.GetState()));
+
+app.MapGet("/api/replay/status", (MqttPublisher publisher) => Results.Ok(publisher.GetReplayStatus()));
 
 app.MapPost("/api/objects", (SimulationManager simulation, CreateObjectsRequest request) =>
 {
