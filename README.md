@@ -2,7 +2,7 @@
 
 Эмулятор объектов и оборудования с веб-интерфейсом и публикацией телеметрии в MQTT.
 
-Текущая версия: `0.0.1`
+Текущая версия: `0.0.2`
 
 ## Установка
 
@@ -116,3 +116,71 @@ rm -rf cg-emurouter
 ```
 
 3. (Опционально) удалить установленный `.NET SDK`, если он больше не нужен.
+
+---
+
+## Развёртывание на Ubuntu 24 как systemd-служба
+
+Для Ubuntu 24 в репозитории есть скрипт `manage.sh`, который автоматизирует
+установку, обновление и удаление.
+
+### Подготовка (один раз)
+
+```bash
+git clone https://github.com/zergont/cg-emurouter.git
+cd cg-emurouter
+chmod +x manage.sh
+```
+
+### Установка
+
+```bash
+sudo ./manage.sh install
+```
+
+Скрипт выполнит:
+- установку `.NET 8 SDK` из стандартных репозиториев Ubuntu 24;
+- создание системного пользователя `cg-emulator`;
+- сборку и публикацию приложения в `/opt/cg-emurouter/app/`;
+- создание `emulator.yaml` из примера (только при первом запуске);
+- регистрацию и запуск службы `cg-emurouter` через systemd.
+
+После установки отредактируйте конфигурацию:
+
+```bash
+sudo nano /opt/cg-emurouter/app/emulator.yaml
+sudo systemctl restart cg-emurouter
+```
+
+Обязательно проверить: `web.bind_ip`, `web.port`, `mqtt.host`, `mqtt.port`.
+
+### Проверка работы
+
+```bash
+# Состояние службы и текущие параметры симулятора
+./manage.sh status
+
+# Логи в реальном времени
+sudo journalctl -u cg-emurouter -f
+
+# MQTT-поток
+mosquitto_sub -h <mqtt-host> -t 'cg/v1/telemetry/SN/#' -v
+```
+
+### Обновление
+
+```bash
+sudo ./manage.sh update
+```
+
+Выполнит `git pull`, пересборку и перезапуск службы.
+`emulator.yaml` при этом не перезаписывается.
+
+### Удаление
+
+```bash
+sudo ./manage.sh uninstall
+```
+
+Останавливает и удаляет службу, файлы `/opt/cg-emurouter` и пользователя `cg-emulator`.
+Для удаления `.NET SDK` следуйте подсказке в выводе скрипта.

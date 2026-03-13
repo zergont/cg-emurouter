@@ -21,7 +21,7 @@ var app = builder.Build();
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-app.MapGet("/api/version", () => Results.Ok(new { version = "0.0.1" }));
+app.MapGet("/api/version", () => Results.Ok(new { version = "0.0.2" }));
 
 app.MapGet("/api/state", (SimulationManager simulation) => Results.Ok(simulation.GetState()));
 
