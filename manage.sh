@@ -7,7 +7,6 @@ set -euo pipefail
 REPO_URL="https://github.com/zergont/cg-emurouter.git"
 INSTALL_DIR="/opt/cg-emurouter"
 APP_DIR="$INSTALL_DIR/app"
-SRC_DIR="$INSTALL_DIR/src"
 SERVICE_NAME="cg-emurouter"
 SERVICE_USER="cg-emulator"
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
@@ -43,32 +42,31 @@ cmd_install() {
         info "Пользователь $SERVICE_USER уже существует."
     fi
 
-    # 3. Клонирование исходников
-    mkdir -p "$INSTALL_DIR"
-    if [[ -d "$SRC_DIR/.git" ]]; then
-        warn "Исходники уже есть, выполняю git pull..."
-        git -C "$SRC_DIR" pull
+    # 3. Репозиторий
+    if [[ -d "$INSTALL_DIR/.git" ]]; then
+        info "Репозиторий уже существует, выполняю git pull..."
+        git -C "$INSTALL_DIR" pull
     else
-        info "Клонирование репозитория..."
-        git clone "$REPO_URL" "$SRC_DIR"
+        info "Клонирование репозитория в $INSTALL_DIR..."
+        git clone "$REPO_URL" "$INSTALL_DIR"
     fi
 
     # 4. Публикация
     info "Сборка и публикация..."
     mkdir -p "$APP_DIR"
-    dotnet publish "$SRC_DIR/src/CgEmulator" -c Release -o "$APP_DIR" --nologo -v quiet
+    dotnet publish "$INSTALL_DIR/src/CgEmulator" -c Release -o "$APP_DIR" --nologo -v quiet
 
     # 5. Конфигурация (не перезаписывать существующую)
     if [[ ! -f "$APP_DIR/emulator.yaml" ]]; then
         info "Создание emulator.yaml из примера..."
-        cp "$SRC_DIR/emulator.example.yaml" "$APP_DIR/emulator.yaml"
+        cp "$INSTALL_DIR/emulator.example.yaml" "$APP_DIR/emulator.yaml"
         warn "Отредактируйте $APP_DIR/emulator.yaml (mqtt.host, web.bind_ip, web.port)"
     else
         info "Конфигурация уже существует, не перезаписываю."
     fi
 
-    # 6. Права
-    chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+    # 6. Права (только на опубликованное приложение)
+    chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
 
     # 7. systemd-юнит
     info "Регистрация systemd-службы..."
@@ -110,16 +108,16 @@ cmd_update() {
     require_root update
     info "=== Обновление $SERVICE_NAME ==="
 
-    [[ -d "$SRC_DIR/.git" ]] \
-        || error "Исходники не найдены. Сначала выполните: sudo ./manage.sh install"
+    [[ -d "$INSTALL_DIR/.git" ]] \
+        || error "Репозиторий не найден. Сначала выполните: sudo ./manage.sh install"
 
     info "Получение обновлений из Git..."
-    git -C "$SRC_DIR" pull
+    git -C "$INSTALL_DIR" pull
 
     info "Пересборка и публикация..."
-    dotnet publish "$SRC_DIR/src/CgEmulator" -c Release -o "$APP_DIR" --nologo -v quiet
+    dotnet publish "$INSTALL_DIR/src/CgEmulator" -c Release -o "$APP_DIR" --nologo -v quiet
 
-    chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+    chown -R "$SERVICE_USER:$SERVICE_USER" "$APP_DIR"
 
     info "Перезапуск службы..."
     systemctl restart "$SERVICE_NAME"

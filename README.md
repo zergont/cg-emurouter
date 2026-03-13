@@ -124,26 +124,27 @@ rm -rf cg-emurouter
 Для Ubuntu 24 в репозитории есть скрипт `manage.sh`, который автоматизирует
 установку, обновление и удаление.
 
-### Подготовка (один раз)
+### Подготовка и установка
+
+Скрипт `manage.sh install` сам клонирует репозиторий в `/opt/cg-emurouter` если его там нет.
+Если репозиторий уже склонирован — просто выполнит `git pull` и продолжит установку.
 
 ```bash
-git clone https://github.com/zergont/cg-emurouter.git
-cd cg-emurouter
-chmod +x manage.sh
+# Вариант А — автоматический (manage.sh сам клонирует):
+sudo curl -fsSL https://raw.githubusercontent.com/zergont/cg-emurouter/main/manage.sh \
+     -o /tmp/manage.sh
+sudo bash /tmp/manage.sh install
+
+# Вариант Б — клонировать вручную, затем установить:
+sudo git clone https://github.com/zergont/cg-emurouter.git /opt/cg-emurouter
+sudo bash /opt/cg-emurouter/manage.sh install
 ```
 
-### Установка
-
-```bash
-sudo ./manage.sh install
+Структура после установки:
 ```
-
-Скрипт выполнит:
-- установку `.NET 8 SDK` из стандартных репозиториев Ubuntu 24;
-- создание системного пользователя `cg-emulator`;
-- сборку и публикацию приложения в `/opt/cg-emurouter/app/`;
-- создание `emulator.yaml` из примера (только при первом запуске);
-- регистрацию и запуск службы `cg-emurouter` через systemd.
+/opt/cg-emurouter/          ← git-репозиторий (исходники, manage.sh)
+/opt/cg-emurouter/app/      ← опубликованные бинарники + emulator.yaml
+```
 
 После установки отредактируйте конфигурацию:
 
@@ -158,7 +159,7 @@ sudo systemctl restart cg-emurouter
 
 ```bash
 # Состояние службы и текущие параметры симулятора
-./manage.sh status
+bash /opt/cg-emurouter/manage.sh status
 
 # Логи в реальном времени
 sudo journalctl -u cg-emurouter -f
@@ -170,7 +171,7 @@ mosquitto_sub -h <mqtt-host> -t 'cg/v1/telemetry/SN/#' -v
 ### Обновление
 
 ```bash
-sudo ./manage.sh update
+sudo bash /opt/cg-emurouter/manage.sh update
 ```
 
 Выполнит `git pull`, пересборку и перезапуск службы.
@@ -179,7 +180,7 @@ sudo ./manage.sh update
 ### Удаление
 
 ```bash
-sudo ./manage.sh uninstall
+sudo bash /opt/cg-emurouter/manage.sh uninstall
 ```
 
 Останавливает и удаляет службу, файлы `/opt/cg-emurouter` и пользователя `cg-emulator`.
