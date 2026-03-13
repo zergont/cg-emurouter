@@ -43,11 +43,11 @@ mosquitto_sub -h 10.10.10.1 -t 'cg/v1/telemetry/SN/#' -v
 ## Установка на сервер из Git
 
 1. Установить `.NET SDK 8.0+` на сервер.
-2. Клонировать репозиторий:
+2. Клонировать репозиторий в `/opt/`:
 
 ```bash
-git clone https://github.com/zergont/cg-emurouter.git
-cd cg-emurouter
+git clone https://github.com/zergont/cg-emurouter.git /opt/cg-emurouter
+cd /opt/cg-emurouter
 ```
 
 3. Подготовить конфиг:
@@ -60,7 +60,7 @@ cp emulator.example.yaml emulator.yaml
 5. Запустить:
 
 ```bash
-dotnet run --project src/CgEmulator -- --config emulator.yaml
+dotnet run --project src/CgEmulator
 ```
 
 ## Работа сервиса
