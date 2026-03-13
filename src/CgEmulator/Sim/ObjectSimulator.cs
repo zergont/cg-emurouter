@@ -23,7 +23,7 @@ public sealed class ObjectSimulator
         EquipmentPeriodSec = equipmentPeriodSec;
         _config = config;
         _random = random;
-        _equipment = Enumerable.Range(1, equipmentCount).Select(i => new EquipmentSimulator(i, random)).ToList();
+        _equipment = Enumerable.Range(1, equipmentCount).Select(i => new EquipmentSimulator(i, random, config.Sim)).ToList();
         _gpsCountdown = config.Defaults.GpsPeriodSec;
         _pccCountdown = equipmentPeriodSec;
     }
@@ -81,7 +81,7 @@ public sealed class ObjectSimulator
             {
                 latitude = Math.Round(CurrentLatitude, 6),
                 longitude = Math.Round(CurrentLongitude, 6),
-                satellites = _random.Next(3, 13),
+                satellites = _random.Next(_config.Sim.SatellitesMin, _config.Sim.SatellitesMax + 1),
                 fix_status = 1,
                 timestamp = utcNow.ToUnixTimeSeconds(),
                 date = msk.ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture),

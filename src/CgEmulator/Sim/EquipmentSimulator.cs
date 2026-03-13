@@ -1,23 +1,27 @@
 using System.Text.Json.Serialization;
+using CgEmulator.Config;
 
 namespace CgEmulator.Sim;
 
 public sealed class EquipmentSimulator
 {
     private readonly Random _random;
+    private readonly SimConfig _simConfig;
     private int _state;
     private int _secondsInStateRemaining;
     private int _targetKw;
     private int _targetHoldRemaining;
     private double _counterAccumulator;
 
-    public EquipmentSimulator(int serverId, Random random)
+    public EquipmentSimulator(int serverId, Random random, SimConfig simConfig)
     {
         ServerId = serverId;
         _random = random;
-        NominalPower3019 = random.Next(5, 21) * 1000;
-        EngineRunningTime70 = (uint)random.NextInt64(0, 10_000_001);
-        ControllerOnTime290 = (uint)random.Next(0, 10001);
+        _simConfig = simConfig;
+        var steps = (simConfig.NominalPowerMaxKw - simConfig.NominalPowerMinKw) / simConfig.NominalPowerStepKw;
+        NominalPower3019 = simConfig.NominalPowerMinKw + random.Next(0, steps + 1) * simConfig.NominalPowerStepKw;
+        EngineRunningTime70 = (uint)random.NextInt64(0, simConfig.EngineTimeInitialMax + 1L);
+        ControllerOnTime290 = (uint)random.Next(0, simConfig.ControllerTimeInitialMax + 1);
         _state = 0;
         _secondsInStateRemaining = NextStateDuration(_state);
     }
@@ -88,13 +92,13 @@ public sealed class EquipmentSimulator
     {
         return state switch
         {
-            0 => _random.Next(1800, 7201),
-            1 => 60,
-            2 => 60,
-            3 => 900,
-            4 => _random.Next(7200, 172801),
-            5 => 1800,
-            6 => 60,
+            0 => _random.Next(_simConfig.State0MinSec, _simConfig.State0MaxSec + 1),
+            1 => _simConfig.State1DurSec,
+            2 => _simConfig.State2DurSec,
+            3 => _simConfig.State3DurSec,
+            4 => _random.Next(_simConfig.State4MinSec, _simConfig.State4MaxSec + 1),
+            5 => _simConfig.State5DurSec,
+            6 => _simConfig.State6DurSec,
             _ => 60
         };
     }
@@ -132,14 +136,14 @@ public sealed class EquipmentSimulator
 
         if (Load34Kw == _targetKw && _targetHoldRemaining <= 0)
         {
-            _targetHoldRemaining = _random.Next(60, 601);
+            _targetHoldRemaining = _random.Next(_simConfig.LoadHoldMinSec, _simConfig.LoadHoldMaxSec + 1);
         }
     }
 
     private void PickNextTarget()
     {
-        var min = (int)Math.Round(NominalPower3019 * 0.03);
-        var max = (int)Math.Round(NominalPower3019 * 0.09);
+        var min = (int)Math.Round(NominalPower3019 * _simConfig.LoadMinFactor);
+        var max = (int)Math.Round(NominalPower3019 * _simConfig.LoadMaxFactor);
         _targetKw = _random.Next(min, max + 1);
     }
 

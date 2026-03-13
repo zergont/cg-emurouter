@@ -90,8 +90,8 @@ mosquitto_sub -h <mqtt-host> -t 'cg/v1/telemetry/SN/#' -v
 
 ```yaml
 replay:
-  rate_per_sec: 10
-  buffer_max_size: 1000
+  rate_per_sec: 20
+  buffer_max_size: 100000
 ```
 
 - `rate_per_sec` — максимальное число сообщений в секунду при воспроизведении буфера.
